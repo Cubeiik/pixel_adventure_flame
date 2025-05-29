@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:pixel_adventure_flame/components/background_tile.dart';
 import 'package:pixel_adventure_flame/components/checkpoint.dart';
+import 'package:pixel_adventure_flame/components/chicken.dart';
 import 'package:pixel_adventure_flame/components/collision_block.dart';
 import 'package:pixel_adventure_flame/components/fruit.dart';
 
@@ -41,35 +42,31 @@ class Level extends World with HasGameReference<PixelAdventure> {
   void _scrollingBackground() {
     final backgroundLayer = level.tileMap.getLayer('Background');
 
-    const tileSize = 64;
-    final numTilesY = (game.size.y / tileSize).floor();
-    final numTilesX = (game.size.x / tileSize).floor();
-
     if (backgroundLayer != null) {
       final backgroundColor =
           backgroundLayer.properties.getValue('BackgroundColor');
 
-      for (double y = 0; y < game.size.y / numTilesY; y++) {
-        for (double x = 0; x < numTilesX; x++) {
-          final backgroundTile = BackgroundTile(
-            color: backgroundColor ?? 'Gray',
-            position: Vector2(x * tileSize, y * tileSize),
-          );
+      final backgroundTile = BackgroundTile(
+        color: backgroundColor ?? 'Gray',
+        position: Vector2(0, 0),
+      );
 
-          add(backgroundTile);
-        }
-      }
+      add(backgroundTile);
     }
   }
 
   void _spawningObjects() {
     final spawnPointsLayer = level.tileMap.getLayer<ObjectGroup>('Spawnpoints');
 
+    print('SPAWN');
+
     if (spawnPointsLayer != null) {
-      for (final spawnPoint in spawnPointsLayer!.objects) {
+      for (final spawnPoint in spawnPointsLayer.objects) {
         switch (spawnPoint.class_) {
           case 'Player':
             player.position = Vector2(spawnPoint.x, spawnPoint.y);
+            player.startingPosition = Vector2(spawnPoint.x, spawnPoint.y);
+            player.scale.x = 1;
             add(player);
 
             break;
@@ -106,6 +103,20 @@ class Level extends World with HasGameReference<PixelAdventure> {
                 size: Vector2(spawnPoint.width, spawnPoint.height));
 
             add(checkpoint);
+            break;
+
+          case 'Chicken':
+            final offNeg = spawnPoint.properties.getValue('offNeg');
+            final offPos = spawnPoint.properties.getValue('offPos');
+
+            final chicken = Chicken(
+              position: Vector2(spawnPoint.x, spawnPoint.y),
+              size: Vector2(spawnPoint.width, spawnPoint.height),
+              offNeg: offNeg,
+              offPos: offPos,
+            );
+
+            add(chicken);
             break;
           default:
         }

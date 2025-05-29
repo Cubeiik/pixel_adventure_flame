@@ -19,9 +19,11 @@ class PixelAdventure extends FlameGame
   late CameraComponent cam;
   Player player = Player(character: 'Ninja Frog');
   late JoystickComponent joystick;
-  bool showControls = true;
+  bool showControls = false;
+  bool playSounds = false;
+  double soundVolume = 0.3;
 
-  List<String> levelNames = ['Level-01', 'Level-02'];
+  List<String> levelNames = ['Level-01', 'Level-02', 'Level-03'];
   int currentLevelIndex = 0;
 
   @override
@@ -114,7 +116,10 @@ class PixelAdventure extends FlameGame
       );
 
       cam = CameraComponent.withFixedResolution(
-          world: world, width: 640, height: 360);
+        world: world,
+        width: 640,
+        height: 360,
+      );
       cam.viewfinder.anchor = Anchor.topLeft;
 
       addAll([cam, world]);
